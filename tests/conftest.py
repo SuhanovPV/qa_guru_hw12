@@ -1,4 +1,5 @@
 import os
+from email.policy import default
 from trace import Trace
 
 import pytest
@@ -11,21 +12,30 @@ from selenium.webdriver.common.devtools.v128.storage import TrustTokens
 from utils import attach
 
 
+def pytest_addoption(parser):
+    parser.addoption(
+        '--browser_version',
+        default='100.0'
+    )
+
+
 @pytest.fixture(scope="session", autouse=True)
 def load_env():
     load_dotenv()
 
 
 @pytest.fixture(scope='function', autouse=True)
-def browser_set():
+def browser_set(request):
     selenoid_login = os.getenv('LOGIN')
     selenoid_pass = os.getenv('PASSWORD')
     selenoid_url = 'selenoid.autotests.cloud'
 
+    browser_version = request.config.getoption('--browser_version')
+
     options = Options()
     selenoid_capabilities = {
         "browserName": "chrome",
-        "browserVersion": "100.0",
+        "browserVersion": browser_version,
         "selenoid:options": {
             "enableVNC": True,
             "enableVideo": True
