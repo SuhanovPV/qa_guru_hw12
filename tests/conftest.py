@@ -1,17 +1,26 @@
+import os
+from trace import Trace
+
 import pytest
+from dotenv import load_dotenv
 from selene import browser
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
+from selenium.webdriver.common.devtools.v128.storage import TrustTokens
+
 from utils import attach
+
+
+@pytest.fixture(scope="session", autouse=True)
+def load_env():
+    load_dotenv()
 
 
 @pytest.fixture(scope='function', autouse=True)
 def browser_set():
-
-    selenoid_login = 'user1'
-    selenoid_pass = '1234'
+    selenoid_login = os.getenv('LOGIN')
+    selenoid_pass = os.getenv('PASSWORD')
     selenoid_url = 'selenoid.autotests.cloud'
-
 
     options = Options()
     selenoid_capabilities = {
