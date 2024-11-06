@@ -1,21 +1,20 @@
 import os
-from email.policy import default
-from trace import Trace
 
 import pytest
 from dotenv import load_dotenv
 from selene import browser
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
-from selenium.webdriver.common.devtools.v128.storage import TrustTokens
 
 from utils import attach
+
+DEFAULT_BROWSER_VERSION = "120.0"
 
 
 def pytest_addoption(parser):
     parser.addoption(
         '--browser_version',
-        default='100.0'
+        default='120.0'
     )
 
 
@@ -31,6 +30,7 @@ def browser_set(request):
     selenoid_url = 'selenoid.autotests.cloud'
 
     browser_version = request.config.getoption('--browser_version')
+    browser_version = browser_version if browser_version != "" else DEFAULT_BROWSER_VERSION
 
     options = Options()
     selenoid_capabilities = {
