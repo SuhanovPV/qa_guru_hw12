@@ -17,7 +17,7 @@ def pytest_addoption(parser):
         default='120.0'
     )
     parser.addoption(
-        '--remote_browser'
+        '--browser_url'
     )
 
 
@@ -30,7 +30,7 @@ def load_env():
 def browser_set(request):
     selenoid_login = os.getenv('LOGIN')
     selenoid_pass = os.getenv('PASSWORD')
-    selenoid_url = request.config.getoption('--remote_browser')
+    selenoid_url = request.config.getoption('--browser_url')
 
     if selenoid_url:
         browser_version = request.config.getoption('--browser_version')

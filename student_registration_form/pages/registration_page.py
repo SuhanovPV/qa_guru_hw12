@@ -44,7 +44,7 @@ class RegistrationPage:
         return self
 
     def scroll_to_page(self):
-        browser.element('#subjectsInput').perform(command.js.scroll_into_view)
+        browser.element('#submit').perform(command.js.scroll_into_view)
         return self
 
     def select_hobbies(self, value):

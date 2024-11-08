@@ -19,6 +19,7 @@ def test_fill_form():
             .select_gender('Male') \
             .fill_mobile('8800535653') \
             .fill_date_of_birth('1988', '3', '05') \
+            .scroll_to_page() \
             .fill_subjects('Maths') \
             .fill_subjects('Computer Science') \
             .select_hobbies('Sports') \
