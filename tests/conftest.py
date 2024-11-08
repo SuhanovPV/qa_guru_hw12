@@ -16,6 +16,9 @@ def pytest_addoption(parser):
         '--browser_version',
         default='120.0'
     )
+    parser.addoption(
+        '--remote_browser'
+    )
 
 
 @pytest.fixture(scope="session", autouse=True)
@@ -27,35 +30,41 @@ def load_env():
 def browser_set(request):
     selenoid_login = os.getenv('LOGIN')
     selenoid_pass = os.getenv('PASSWORD')
-    selenoid_url = 'selenoid.autotests.cloud'
+    selenoid_url = request.config.getoption('--remote_browser')
 
-    browser_version = request.config.getoption('--browser_version')
-    browser_version = browser_version if browser_version != "" else DEFAULT_BROWSER_VERSION
+    if selenoid_url:
+        browser_version = request.config.getoption('--browser_version')
+        browser_version = browser_version if browser_version != "" else DEFAULT_BROWSER_VERSION
 
-    options = Options()
-    selenoid_capabilities = {
-        "browserName": "chrome",
-        "browserVersion": browser_version,
-        "selenoid:options": {
-            "enableVNC": True,
-            "enableVideo": True
+        options = Options()
+        selenoid_capabilities = {
+            "browserName": "chrome",
+            "browserVersion": browser_version,
+            "selenoid:options": {
+                "enableVNC": True,
+                "enableVideo": True
+            }
         }
-    }
-    options.capabilities.update(selenoid_capabilities)
-    driver = webdriver.Remote(
-        command_executor=f"https://{selenoid_login}:{selenoid_pass}@{selenoid_url}/wd/hub",
-        options=options)
+        options.capabilities.update(selenoid_capabilities)
+        driver = webdriver.Remote(
+            command_executor=f"https://{selenoid_login}:{selenoid_pass}@{selenoid_url}/wd/hub",
+            options=options)
+        browser.config.driver = driver
 
-    browser.config.driver = driver
+    else:
+        options = webdriver.FirefoxOptions()
+        options.page_load_strategy = 'eager'
+        browser.config.driver_options = options
+
     browser.config.window_height = '1080'
     browser.config.window_width = '1920'
     browser.config.base_url = 'https://demoqa.com'
 
     yield
-
-    attach.add_screenshot(browser)
-    attach.add_logs(browser)
-    attach.add_html(browser)
-    attach.add_video(browser)
+    if selenoid_url:
+        attach.add_screenshot(browser)
+        attach.add_logs(browser)
+        attach.add_html(browser)
+        attach.add_video(browser)
 
     browser.quit()
